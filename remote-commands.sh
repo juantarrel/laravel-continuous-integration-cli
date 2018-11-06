@@ -42,26 +42,23 @@ function pullProject {
     cd ~/Projects
     git clone $2
     echo -e "\033[0;32mRepository cloned\033[m"
+
     cd $1
 
-    git checkout dev
+    git checkout $3
 
     if [ -f ~/Projects/.env ]; then
         cp ~/Projects/.env ~/Projects/$1/
     fi
 
-    echo "Setting permissions"
-    sudo chmod 777 -R ~/Projects/$1/storage/logs/
-    sudo chmod 777 -R ~/Projects/$1/bootstrap/cache/
-    sudo chmod 777 -R ~/Projects/$1/storage/framework
-    echo -e "\033[0;32mPermissions ready\033[m"
-
-
+    echo "Removing git files..."
+    sudo rm -rf .git*
+    sudo rm .env.example
+    sudo rm README.md
 
     echo "Installing dependencies.."
     composer install
 
-    cd $1
 
     php artisan key:generate
     echo "Migrations..."
@@ -70,4 +67,10 @@ function pullProject {
     echo -e "\033[0;32mBackend ready\033[m"
     npm i
     echo -e "\033[0;32mFrontend ready\033[m"
+
+    # @TODO change permissions
+    echo "Setting permissions"
+    sudo chmod 777 -R ~/Projects/$1/storage/
+    sudo chmod 777 -R ~/Projects/$1/bootstrap/
+    echo -e "\033[0;32mPermissions ready\033[m"
 }
