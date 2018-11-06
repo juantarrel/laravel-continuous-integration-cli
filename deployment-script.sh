@@ -32,6 +32,7 @@ echo -e "PRODUCTION \t(3)"
 echo -e "EXIT \t\t(0)"
 read ENVIROMENT
 
+# @TODO refactor this function
 function listBranches {
     echo "Listing branches..."
     if ! [ -d $NAME_PROJECT ]; then
@@ -41,7 +42,7 @@ function listBranches {
     cd $NAME_PROJECT
     git pull>/dev/null
     git branch -av > branches.txt
-    awk 'BEGIN {FS=" "} {gsub("*", "")} {gsub("refs/heads/","")} {gsub("remotes/origin/","")} {print $1}' branches.txt > branches_clean.txt
+    awk 'BEGIN {FS=" "} {gsub("\*", "")} {gsub("refs/heads/","")} {gsub("remotes/origin/","")} {print $1}' branches.txt > branches_clean.txt
     sort -u branches_clean.txt > branches_uniques.txt
     readarray BRANCHES_ARRAY < branches_uniques.txt
 
