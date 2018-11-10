@@ -20,8 +20,8 @@ NAME_PROJECT=
 # repository
 GIT_REPOSITORY="https://user:password@bitbucket.org/userowner/$NAME_PROJECT.git"
 ENVIROMENT=0
-# remote commands
-REMOTE_COMMANDS=`cat remote-commands.sh`
+# remote commands @TODO its works but need refactor
+REMOTE_COMMANDS=`cat remote-commands.sh | awk '{print $0, "\nif [[ $? -gt 0 ]]; then\n echo \"\033[0;31mThe is an error\033[m\"\nreturn 1\n fi"}'`
 
 BRANCH_TO_DEPLOY=""
 echo "What enviroment do you want to deploy?"
@@ -32,17 +32,15 @@ echo -e "PRODUCTION \t(3)"
 echo -e "EXIT \t\t(0)"
 read ENVIROMENT
 
-# @TODO refactor this function
 function listBranches {
     echo "Listing branches..."
     if ! [ -d $NAME_PROJECT ]; then
-        git clone $GIT_REPOSITORY>/dev/null
+        git clone $GIT_REPOSITORY &>/dev/null
     fi
 
     cd $NAME_PROJECT
     git pull>/dev/null
-    git branch -av > branches.txt
-    awk 'BEGIN {FS=" "} {gsub("\*", "")} {gsub("refs/heads/","")} {gsub("remotes/origin/","")} {print $1}' branches.txt > branches_clean.txt
+    git branch -av | awk 'BEGIN {FS=" "} {gsub("*|refs/heads/|remotes/origin/", "")} {print $1}' > branches_clean.txt
     sort -u branches_clean.txt > branches_uniques.txt
     readarray BRANCHES_ARRAY < branches_uniques.txt
 
@@ -88,7 +86,10 @@ function deploy {
         pullProject $NAME_PROJECT $GIT_REPOSITORY $BRANCH_TO_DEPLOY
 EOSSH
 
-    echo -e "\033[0;32mThe enviroment $ENV_NAME is done !!!  check here -> http://$ENV\033[m"
+    if [[ $? -eq 0 ]]; then
+        echo -e "\033[0;32mThe enviroment $ENV_NAME is done !!!  check here -> http://$ENV\033[m"
+        return 0
+    fi
 
 }
 

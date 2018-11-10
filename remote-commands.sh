@@ -10,7 +10,8 @@ function makeBackup {
     fi
 
     echo "Creating backup for current project..."
-    cp -rf `echo "~/Projects/$NAME_PROJECT"` Backups
+    cp -rf ~/Projects/$NAME_PROJECT Backups
+
     cd Backups
 
     if [ -d "$NAME_PROJECT/vendor" ]; then
@@ -26,6 +27,11 @@ function makeBackup {
     tar -zcvf `echo "$(date "+%Y-%m-%d-%H-%M-%S").tar.gz"` `echo "$NAME_PROJECT"`>/dev/null
     rm -rf $NAME_PROJECT
     echo -e "\033[0;32mBackup created\033[m"
+
+    if [[ $? -gt 0 ]]; then
+        echo "The is an error"
+        return 1
+    fi
 }
 
 function pullProject {
