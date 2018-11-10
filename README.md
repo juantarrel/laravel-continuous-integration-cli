@@ -4,6 +4,7 @@ Laravel Continuous Integration using CLI
 Just need to configurate the vars
 
 # User server 
+// user
 AWS_USER
 # Enviroments
 AWS_QA
